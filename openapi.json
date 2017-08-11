@@ -2,9 +2,9 @@
  "swagger": "2.0",
  "info": {
   "version": "1.0.0",
-  "title": "echo-api.endpoints.black-obelisk-161316.cloud.goog"
+  "title": "echo-api.endpoints.fir-storage-bed15.cloud.goog"
  },
- "host": "echo-api.endpoints.black-obelisk-161316.cloud.goog",
+ "host": "echo-api.endpoints.fir-storage-bed15.cloud.goog",
  "basePath": "/_ah/api",
  "schemes": [
   "https"
@@ -176,6 +176,76 @@
      }
     ]
    }
+  },
+  "/echo/v1/my_images": {
+   "post": {
+    "operationId": "EchoMyImages",
+    "parameters": [
+     {
+      "name": "user_id",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "A successful response",
+      "schema": {
+       "$ref": "#/definitions/MyImagesResult"
+      }
+     }
+    },
+    "security": [
+     {
+      "api_key": [ ]
+     }
+    ]
+   }
+  },
+  "/echo/v1/record_upload": {
+   "post": {
+    "operationId": "EchoRecordUpload",
+    "parameters": [
+     {
+      "name": "user_id",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     },
+     {
+      "name": "download_url",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     },
+     {
+      "name": "privacy",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     },
+     {
+      "name": "comment",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "A successful response",
+      "schema": {
+       "$ref": "#/definitions/Message"
+      }
+     }
+    },
+    "security": [
+     {
+      "api_key": [ ]
+     }
+    ]
+   }
   }
  },
  "securityDefinitions": {
@@ -218,6 +288,16 @@
    "properties": {
     "message": {
      "type": "string"
+    }
+   }
+  },
+  "MyImagesResult": {
+   "properties": {
+    "urls": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
     }
    }
   }

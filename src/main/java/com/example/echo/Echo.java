@@ -27,6 +27,10 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.UnauthorizedException;
+import com.google.appengine.api.datastore.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** The Echo API which Endpoints will be exposing. */
 // [START echo_api_annotation]
@@ -49,7 +53,12 @@ import com.google.api.server.spi.response.UnauthorizedException;
     // [END_EXCLUDE]
     )
 // [END echo_api_annotation]
+
+
+
 public class Echo {
+
+
   /**
    * Echoes the received message back. If n is a non-negative integer, the message is copied that
    * many times in the returned message.
@@ -63,6 +72,7 @@ public class Echo {
   // [START echo_method]
   @ApiMethod(name = "echo")
   public Message echo(Message message, @Named("n") @Nullable Integer n) {
+
     return doEcho(message, n);
   }
   // [END echo_method]
@@ -78,8 +88,10 @@ public class Echo {
    * depending on the API method name. In this case, the HTTP method will default to POST.
    */
   // [START echo_path]
-  @ApiMethod(name = "echo_path_parameter", path = "echo/{n}")
+  @ApiMethod(name = "echo_path_parameter",
+          path = "echo/{n}")
   public Message echoPathParameter(Message message, @Named("n") int n) {
+
     return doEcho(message, n);
   }
   // [END echo_path]
@@ -95,11 +107,18 @@ public class Echo {
    * depending on the API method name. In this case, the HTTP method will default to POST.
    */
   // [START echo_api_key]
-  @ApiMethod(name = "echo_api_key", path = "echo_api_key", apiKeyRequired = AnnotationBoolean.TRUE)
+  @ApiMethod(name = "echo_api_key",
+          path = "echo_api_key",
+          apiKeyRequired = AnnotationBoolean.TRUE)
   public Message echoApiKey(Message message, @Named("n") @Nullable Integer n) {
+
     return doEcho(message, n);
   }
   // [END echo_api_key]
+
+
+
+
 
   private Message doEcho(Message message, Integer n) {
     if (n != null && n >= 0) {
@@ -114,6 +133,90 @@ public class Echo {
     }
     return message;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+  // [START record_upload]
+  @ApiMethod(name = "record_upload",
+          path = "record_upload",
+          apiKeyRequired = AnnotationBoolean.TRUE)
+  public Message recordUpload(
+          @Named("user_id") @Nullable String userId,
+          @Named("download_url") @Nullable String downloadUrl,
+          @Named("privacy") @Nullable String privacy,
+          @Named("comment") @Nullable String comment
+          ) {
+
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Entity uploadedMedia = new Entity("UploadedMedia");
+    uploadedMedia.setIndexedProperty("userId", userId);
+    uploadedMedia.setUnindexedProperty("downloadUrl", downloadUrl);
+    uploadedMedia.setIndexedProperty("privacy", privacy);
+    uploadedMedia.setUnindexedProperty("comment", comment);
+
+    datastore.put(uploadedMedia);
+
+
+    Message returnMessage = new Message();
+    returnMessage.setMessage(downloadUrl);
+    return returnMessage;
+  }
+  // [END record_upload]
+
+
+
+
+  // [START my_images]
+  @ApiMethod(name = "my_images",
+          path = "my_images",
+          apiKeyRequired = AnnotationBoolean.TRUE)
+  public MyImagesResult myImages(
+          @Named("user_id") @Nullable String userId) {
+
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Query.Filter propertyFilter =
+            new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userId);
+    Query photoQuery = new Query("UploadedMedia").setFilter(propertyFilter);
+
+    // This returns weddingPhoto, babyPhoto, and dancePhoto,
+    // but not campingPhoto, because tom is not an ancestor
+    List<Entity> results = datastore.prepare(photoQuery).asList(FetchOptions.Builder.withDefaults());
+
+    List<String> urls = new ArrayList<>();
+    for (Entity result : results) {
+        urls.add((String) result.getProperty("downloadUrl"));
+    }
+
+    MyImagesResult myImages = new MyImagesResult();
+    myImages.setUrls(urls);
+
+    return myImages;
+  }
+  // [END my_images]
+
+
+
+
+
+
+
+
+
+
+
 
   /**
    * Gets the authenticated user's email. If the user is not authenticated, this will return an HTTP
