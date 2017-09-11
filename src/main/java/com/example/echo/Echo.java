@@ -29,8 +29,9 @@ import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.datastore.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** The Echo API which Endpoints will be exposing. */
 // [START echo_api_annotation]
@@ -47,7 +48,7 @@ import java.util.List;
     issuers = {
       @ApiIssuer(
         name = "firebase",
-        issuer = "https://securetoken.google.com/YOUR-PROJECT-ID",
+        issuer = "https://securetoken.google.com/filler-ea8ae",
         jwksUri = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com")
     }
     // [END_EXCLUDE]
@@ -57,93 +58,6 @@ import java.util.List;
 
 
 public class Echo {
-
-
-  /**
-   * Echoes the received message back. If n is a non-negative integer, the message is copied that
-   * many times in the returned message.
-   *
-   * Note that name is specified and will override the default name of "{class name}.{method
-   * name}". For example, the default is "echo.echo".
-   *
-   * Note that httpMethod is not specified. This will default to a reasonable HTTP method
-   * depending on the API method name. In this case, the HTTP method will default to POST.
-   */
-  // [START echo_method]
-  @ApiMethod(name = "echo")
-  public Message echo(Message message, @Named("n") @Nullable Integer n) {
-
-    return doEcho(message, n);
-  }
-  // [END echo_method]
-
-  /**
-   * Echoes the received message back. If n is a non-negative integer, the message is copied that
-   * many times in the returned message.
-   *
-   * Note that name is specified and will override the default name of "{class name}.{method
-   * name}". For example, the default is "echo.echo".
-   *
-   * Note that httpMethod is not specified. This will default to a reasonable HTTP method
-   * depending on the API method name. In this case, the HTTP method will default to POST.
-   */
-  // [START echo_path]
-  @ApiMethod(name = "echo_path_parameter",
-          path = "echo/{n}")
-  public Message echoPathParameter(Message message, @Named("n") int n) {
-
-    return doEcho(message, n);
-  }
-  // [END echo_path]
-
-  /**
-   * Echoes the received message back. If n is a non-negative integer, the message is copied that
-   * many times in the returned message.
-   *
-   * Note that name is specified and will override the default name of "{class name}.{method
-   * name}". For example, the default is "echo.echo".
-   *
-   * Note that httpMethod is not specified. This will default to a reasonable HTTP method
-   * depending on the API method name. In this case, the HTTP method will default to POST.
-   */
-  // [START echo_api_key]
-  @ApiMethod(name = "echo_api_key",
-          path = "echo_api_key",
-          apiKeyRequired = AnnotationBoolean.TRUE)
-  public Message echoApiKey(Message message, @Named("n") @Nullable Integer n) {
-
-    return doEcho(message, n);
-  }
-  // [END echo_api_key]
-
-
-
-
-
-  private Message doEcho(Message message, Integer n) {
-    if (n != null && n >= 0) {
-      StringBuilder sb = new StringBuilder("Cait\'s");
-      for (int i = 0; i < n; i++) {
-        if (i > 0) {
-          sb.append(" ");
-        }
-        sb.append(message.getMessage());
-      }
-      message.setMessage(sb.toString());
-    }
-    return message;
-  }
-
-
-
-
-
-
-
-
-
-
-
 
   // [START record_upload]
   @ApiMethod(name = "record_upload",
@@ -156,6 +70,7 @@ public class Echo {
           @Named("comment") @Nullable String comment
           ) {
 
+    Date timestamp = new Date();
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -164,6 +79,8 @@ public class Echo {
     uploadedMedia.setUnindexedProperty("downloadUrl", downloadUrl);
     uploadedMedia.setIndexedProperty("privacy", privacy);
     uploadedMedia.setUnindexedProperty("comment", comment);
+    uploadedMedia.setIndexedProperty("timestamp", timestamp);
+
 
     datastore.put(uploadedMedia);
 
@@ -207,44 +124,79 @@ public class Echo {
   }
   // [END my_images]
 
+  // [START date_images]
+  @ApiMethod(name = "date_images",
+          path = "date_images",
+          apiKeyRequired = AnnotationBoolean.TRUE)
+  public MyImagesResult dateImages(
+          @Named("timestamp") @Nullable String timestamp) {
 
+    Logger logger = Logger.getLogger(this.getClass().getName());
 
+    // TODO: return a proper error if string isn't a long
+    long timestampLong = Long.valueOf(timestamp);
 
+    logger.severe("timestampLong: " + timestampLong);
 
+    //Date date = new Date(timestampLong);
 
+//    Calendar calStart = new GregorianCalendar();
+//    calStart.setTime(date);
+//    calStart.set(Calendar.DAY_OF_YEAR, calStart.get(Calendar.DAY_OF_YEAR));
+//    calStart.set(Calendar.HOUR_OF_DAY, 0);
+//    calStart.set(Calendar.MINUTE, 0);
+//    calStart.set(Calendar.SECOND, 0);
+//    calStart.set(Calendar.MILLISECOND, 0);
+//    Date dateStart = calStart.getTime();
 
+    long timestampStart = timestampLong - (24 * 60 * 60 * 1000); // timestamp minus (24 hrs in milliseconds)
+    long timestampEnd = timestampLong + (5 * 60 * 1000);  // timestamp plus (5 minutes in milliseconds) just to be safe
+                                                          // Internet connection won't be that slow but it doesn't hurt
+                                                          // to make the end time in the future
+    Date dateStart = new Date(timestampStart);
+    Date dateEnd = new Date(timestampEnd);
+    logger.severe("timestampStart: " + timestampStart);
+    logger.severe("timestampEnd: " + timestampEnd);
 
+    //logger.severe("calStart: " + calStart.toString());
 
+//    Calendar calEnd = new GregorianCalendar();
+//    calEnd.setTime(date);
+//    calEnd.set(Calendar.DAY_OF_YEAR, calEnd.get(Calendar.DAY_OF_YEAR)+1);
+//    calEnd.set(Calendar.HOUR_OF_DAY, 0);
+//    calEnd.set(Calendar.MINUTE, 0);
+//    calEnd.set(Calendar.SECOND, 0);
+//    calEnd.set(Calendar.MILLISECOND, 0);
+//    Date dateEnd = calEnd.getTime();
 
+    //logger.severe("calEnd: " + calEnd.toString());
 
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-  /**
-   * Gets the authenticated user's email. If the user is not authenticated, this will return an HTTP
-   * 401.
-   *
-   * Note that name is not specified. This will default to "{class name}.{method name}". For
-   * example, the default is "echo.getUserEmail".
-   *
-   * Note that httpMethod is not required here. Without httpMethod, this will default to GET due
-   * to the API method name. httpMethod is added here for example purposes.
-   */
-  // [START google_id_token_auth]
-  @ApiMethod(
-      httpMethod = ApiMethod.HttpMethod.GET,
-      authenticators = {EspAuthenticator.class},
-      audiences = {"YOUR_OAUTH_CLIENT_ID"},
-      clientIds = {"YOUR_OAUTH_CLIENT_ID"}
-      )
-  public Email getUserEmail(User user) throws UnauthorizedException {
-    if (user == null) {
-      throw new UnauthorizedException("Invalid credentials");
+    Query.Filter startFilter = new Query.FilterPredicate("timestamp", Query.FilterOperator.GREATER_THAN_OR_EQUAL, dateStart);
+    Query.Filter endFilter = new Query.FilterPredicate("timestamp", Query.FilterOperator.LESS_THAN, dateEnd);
+
+    // Use CompositeFilter to combine multiple filters
+    Query.CompositeFilter dateRangeFilter =
+            Query.CompositeFilterOperator.and(startFilter, endFilter);
+
+    Query photoQuery = new Query("UploadedMedia").setFilter(dateRangeFilter);
+    photoQuery.addSort("timestamp", Query.SortDirection.DESCENDING);
+    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "photoQuery: " + photoQuery.toString());
+
+    List<Entity> results = datastore.prepare(photoQuery).asList(FetchOptions.Builder.withDefaults());
+
+    List<String> urls = new ArrayList<>();
+    for (Entity result : results) {
+      urls.add((String) result.getProperty("downloadUrl"));
     }
 
-    Email response = new Email();
-    response.setEmail(user.getEmail());
-    return response;
+    MyImagesResult myImages = new MyImagesResult();
+    myImages.setUrls(urls);
+
+    return myImages;
   }
-  // [END google_id_token_auth]
+  // [END date_images]
 
   /**
    * Gets the authenticated user's email. If the user is not authenticated, this will return an HTTP
@@ -261,7 +213,7 @@ public class Echo {
       path = "firebase_user",
       httpMethod = ApiMethod.HttpMethod.GET,
       authenticators = {EspAuthenticator.class},
-      issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"YOUR-PROJECT-ID"})}
+      issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
       )
   public Email getUserEmailFirebase(User user) throws UnauthorizedException {
     if (user == null) {
