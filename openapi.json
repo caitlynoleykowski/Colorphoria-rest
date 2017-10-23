@@ -2,9 +2,9 @@
  "swagger": "2.0",
  "info": {
   "version": "1.0.0",
-  "title": "echo-api.endpoints.filler-ea8ae.cloud.goog"
+  "title": "mediametadata-api.endpoints.filler-ea8ae.cloud.goog"
  },
- "host": "echo-api.endpoints.filler-ea8ae.cloud.goog",
+ "host": "mediametadata-api.endpoints.filler-ea8ae.cloud.goog",
  "basePath": "/_ah/api",
  "schemes": [
   "https"
@@ -16,9 +16,9 @@
   "application/json"
  ],
  "paths": {
-  "/echo/v1/date_images": {
+  "/mediametadata/v1/date_images": {
    "post": {
-    "operationId": "EchoDateImages",
+    "operationId": "MediametadataDateImages",
     "parameters": [
      {
       "name": "timestamp",
@@ -42,9 +42,9 @@
     ]
    }
   },
-  "/echo/v1/firebase_user": {
+  "/mediametadata/v1/firebase_user": {
    "get": {
-    "operationId": "EchoGetUserEmailFirebase",
+    "operationId": "MediametadataGetUserEmailFirebase",
     "parameters": [ ],
     "responses": {
      "200": {
@@ -70,9 +70,9 @@
     ]
    }
   },
-  "/echo/v1/my_images": {
+  "/mediametadata/v1/my_images": {
    "post": {
-    "operationId": "EchoMyImages",
+    "operationId": "MediametadataMyImages",
     "parameters": [
      {
       "name": "user_id",
@@ -96,9 +96,9 @@
     ]
    }
   },
-  "/echo/v1/record_upload": {
+  "/mediametadata/v1/record_upload": {
    "post": {
-    "operationId": "EchoRecordUpload",
+    "operationId": "MediametadataRecordUpload",
     "parameters": [
      {
       "name": "user_id",

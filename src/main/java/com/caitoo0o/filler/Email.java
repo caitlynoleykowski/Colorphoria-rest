@@ -14,18 +14,17 @@
  * the License.
  */
 
-package com.example.echo;
+package com.caitoo0o.filler;
 
-/** The message bean that will be used in the echo request and response. */
-public class Message {
+/** The email bean that will be used in the getUserEmail response. */
+public class Email {
+  private String email;
 
-  private String message;
-
-  public String getMessage() {
-    return this.message;
+  public String getEmail() {
+    return this.email;
   }
 
-  public void setMessage(String message) {
-    this.message = message;
+  public void setEmail(String email) {
+    this.email = email;
   }
 }

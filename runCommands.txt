@@ -1,0 +1,4 @@
+mvn clean package
+mvn exec:java -DGetSwaggerDoc
+gcloud service-management deploy openapi.json
+mvn appengine:deploy

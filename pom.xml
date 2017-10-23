@@ -18,8 +18,8 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <groupId>com.example.echo</groupId>
-    <artifactId>echo</artifactId>
+    <groupId>com.caitoo0o.filler</groupId>
+    <artifactId>filler-rest</artifactId>
 
     <!--    <parent>
         <artifactId>appengine-doc-samples</artifactId>
@@ -79,9 +79,9 @@
                             <mainClass>com.google.api.server.spi.tools.EndpointsTool</mainClass>
                             <arguments>
                                 <argument>get-swagger-doc</argument>
-                                <argument>--hostname=echo-api.endpoints.${endpoints.project.id}.cloud.goog</argument>
-                                <argument>--war=target/echo-1.0-SNAPSHOT</argument>
-                                <argument>com.example.echo.Echo</argument>
+                                <argument>--hostname=mediametadata-api.endpoints.${endpoints.project.id}.cloud.goog</argument>
+                                <argument>--war=target/filler-rest-1.0-SNAPSHOT</argument>
+                                <argument>com.caitoo0o.filler.MediaMetadata</argument>
                             </arguments>
                         </configuration>
                         <dependencies>
