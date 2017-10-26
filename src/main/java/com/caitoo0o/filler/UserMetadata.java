@@ -52,28 +52,37 @@ import java.util.logging.Logger;
 // [END echo_api_annotation]
 public class UserMetadata {
 
-    // [START record_upload]
     @ApiMethod(name = "record_new_user",
             path = "record_new_user",
             apiKeyRequired = AnnotationBoolean.TRUE)
     public Message record_user_metadata(
                                 @Named("user_id") @Nullable String userId,
                                 @Named("email") @Nullable String email,
-                                @Named("full name") @Nullable String fullName,
+                                @Named("full_name") @Nullable String fullName,
                                 @Named("username") @Nullable String username,
-                                @Named("age") @Nullable String age
+                                @Named("birthday_timestamp_str") @Nullable String birthdayTimestampStr
                                 ) {
-        Date date = new Date();
+        // Get today's date for the user's signupDate
+        Date todaysDate = new Date();
+
+        // Get the birthdayTimestampStr in Date object form
+        Long birthdayTimestamp = Long.valueOf(birthdayTimestampStr);
+        try {
+            birthdayTimestamp = Long.valueOf(birthdayTimestampStr);
+        } catch (NumberFormatException e) {
+            throw new InvalidParameterException("birthdayDate must be a timestamp long sent as a string");
+        }
+        Date birthdayDate = new Date(birthdayTimestamp);
 
         DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
         Entity userMetadata = new Entity("UserMetadata");
         userMetadata.setIndexedProperty("userId", userId);
-        userMetadata.setUnindexedProperty("email", email);
-        userMetadata.setIndexedProperty("fullName", fullName);
+        userMetadata.setUnindexedProperty("email", email); // TODO: Remove
+        userMetadata.setUnindexedProperty("fullName", fullName);
         userMetadata.setUnindexedProperty("username", username);
-        userMetadata.setIndexedProperty("ageOnSignupDate", age);
-        userMetadata.setIndexedProperty("signupDate", date);
+        userMetadata.setUnindexedProperty("birthdayDate", birthdayDate);
+        userMetadata.setUnindexedProperty("signupDate", todaysDate);
 
         datastoreService.put(userMetadata);
 
@@ -81,13 +90,11 @@ public class UserMetadata {
         returnMessage.setMessage(""); // TODO: Don't return a message?
         return returnMessage;
     }
-    // [END record_upload]
 
-    // [START my_images]
-    @ApiMethod(name = "user_metadata",
-            path = "user_metadata",
+    @ApiMethod(name = "user_recorded_status",
+            path = "user_recorded_status",
             apiKeyRequired = AnnotationBoolean.TRUE)
-    public UserMetadataResult userMetadata(@Named("user_id") @Nullable String userId) {
+    public UserRecordStatus userRecordedStatus(@Named("user_id") @Nullable String userId) {
         DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
         Query.Filter propertyFilter =
@@ -101,21 +108,13 @@ public class UserMetadata {
                     .severe("User has been registered multiple times. userId: "+ userId);
         }
 
-        UserMetadataResult userMetadata = null;
+        UserRecordStatus recordedStatus = null;
         if (results.size() > 0) {
-            Entity result = results.get(0);
-            String userIdProperty = (String) result.getProperty("userId");
-            String email = (String) result.getProperty("email");
-            String fullName = (String) result.getProperty("fullName");
-            String username = (String) result.getProperty("username");
-            String ageOnSignupDate = (String) result.getProperty("ageOnSignupDate");
-            String signupDate = (String) result.getProperty("signupDate");
-
-            userMetadata = new UserMetadataResult(userIdProperty, email, fullName, username, ageOnSignupDate, signupDate);
+            recordedStatus = new UserRecordStatus(true);
+        } else {
+            recordedStatus = new UserRecordStatus(false);
         }
 
-        // TODO: Return userMetadata inside another object which states if user is not present
-        return userMetadata;
+        return recordedStatus;
     }
-    // [END my_images]
 }

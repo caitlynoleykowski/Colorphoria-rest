@@ -21,7 +21,8 @@
         <servlet-class>com.google.api.server.spi.EndpointsServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.caitoo0o.filler.MediaMetadata</param-value>
+            <param-value>com.caitoo0o.filler.MediaMetadata,
+                            com.caitoo0o.filler.UserMetadata</param-value>
         </init-param>
     </servlet>
     <!-- Route API method requests to the backend. -->
