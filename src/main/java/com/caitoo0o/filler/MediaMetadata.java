@@ -64,24 +64,34 @@ public class MediaMetadata {
     public Message recordUpload(
                                 @Named("user_id") @Nullable String userId,
                                 @Named("download_url") @Nullable String downloadUrl,
+                                @Named("filename") @Nullable String filename,
                                 @Named("privacy") @Nullable String privacy,
                                 @Named("comment") @Nullable String comment
                                 ) {
-        Date timestamp = new Date();
+        String filepath = "gs://" + "filler-ea8ae.appspot.com" + "/photos/" + filename;
+        boolean adultContent = ImageUtils.detectSafeSearchGcs(filepath);
 
-        DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+        String message = "";
+        if (adultContent) {
+            message = "adult_content";
+        } else {
+            Date timestamp = new Date();
 
-        Entity uploadedMedia = new Entity("UploadedMedia");
-        uploadedMedia.setIndexedProperty("userId", userId);
-        uploadedMedia.setUnindexedProperty("downloadUrl", downloadUrl);
-        uploadedMedia.setIndexedProperty("privacy", privacy);
-        uploadedMedia.setUnindexedProperty("comment", comment);
-        uploadedMedia.setIndexedProperty("timestamp", timestamp);
+            DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
-        datastoreService.put(uploadedMedia);
+            Entity uploadedMedia = new Entity("UploadedMedia");
+            uploadedMedia.setIndexedProperty("userId", userId);
+            uploadedMedia.setUnindexedProperty("downloadUrl", downloadUrl);
+            uploadedMedia.setUnindexedProperty("filename", filename);
+            uploadedMedia.setIndexedProperty("privacy", privacy);
+            uploadedMedia.setUnindexedProperty("comment", comment);
+            uploadedMedia.setIndexedProperty("timestamp", timestamp);
+
+            datastoreService.put(uploadedMedia);
+        }
 
         Message returnMessage = new Message();
-        returnMessage.setMessage(downloadUrl);
+        returnMessage.setMessage(message);
         return returnMessage;
     }
     // [END record_upload]
