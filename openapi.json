@@ -2,9 +2,9 @@
  "swagger": "2.0",
  "info": {
   "version": "1.0.0",
-  "title": "mediametadata-api.endpoints.filler-ea8ae.cloud.goog"
+  "title": "mobile-api.endpoints.filler-ea8ae.cloud.goog"
  },
- "host": "mediametadata-api.endpoints.filler-ea8ae.cloud.goog",
+ "host": "mobile-api.endpoints.filler-ea8ae.cloud.goog",
  "basePath": "/_ah/api",
  "schemes": [
   "https"
@@ -16,9 +16,9 @@
   "application/json"
  ],
  "paths": {
-  "/mediametadata/v1/date_images": {
+  "/mobile/v1/date_images": {
    "post": {
-    "operationId": "MediametadataDateImages",
+    "operationId": "MobileDateImages",
     "parameters": [
      {
       "name": "timestamp",
@@ -37,14 +37,26 @@
     },
     "security": [
      {
+      "firebase": [ ]
+     },
+     {
       "api_key": [ ]
+     }
+    ],
+    "x-security": [
+     {
+      "firebase": {
+       "audiences": [
+        "filler-ea8ae"
+       ]
+      }
      }
     ]
    }
   },
-  "/mediametadata/v1/firebase_user": {
+  "/mobile/v1/firebase_user": {
    "get": {
-    "operationId": "MediametadataGetUserEmailFirebase",
+    "operationId": "MobileGetUserEmailFirebase",
     "parameters": [ ],
     "responses": {
      "200": {
@@ -70,17 +82,41 @@
     ]
    }
   },
-  "/mediametadata/v1/my_images": {
+  "/mobile/v1/firebase_user2": {
    "post": {
-    "operationId": "MediametadataMyImages",
-    "parameters": [
+    "operationId": "MobileGetUserEmailFirebase2",
+    "parameters": [ ],
+    "responses": {
+     "200": {
+      "description": "A successful response",
+      "schema": {
+       "$ref": "#/definitions/Email"
+      }
+     }
+    },
+    "security": [
      {
-      "name": "user_id",
-      "in": "query",
-      "required": false,
-      "type": "string"
+      "firebase": [ ]
+     },
+     {
+      "api_key": [ ]
      }
     ],
+    "x-security": [
+     {
+      "firebase": {
+       "audiences": [
+        "filler-ea8ae"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "/mobile/v1/my_images": {
+   "post": {
+    "operationId": "MobileMyImages",
+    "parameters": [ ],
     "responses": {
      "200": {
       "description": "A successful response",
@@ -91,23 +127,91 @@
     },
     "security": [
      {
+      "firebase": [ ]
+     },
+     {
       "api_key": [ ]
+     }
+    ],
+    "x-security": [
+     {
+      "firebase": {
+       "audiences": [
+        "filler-ea8ae"
+       ]
+      }
      }
     ]
    }
   },
-  "/mediametadata/v1/record_upload": {
+  "/mobile/v1/record_new_user": {
    "post": {
-    "operationId": "MediametadataRecordUpload",
+    "operationId": "MobileRecord_user_metadata",
     "parameters": [
      {
-      "name": "user_id",
+      "name": "email",
       "in": "query",
       "required": false,
       "type": "string"
      },
      {
+      "name": "full_name",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     },
+     {
+      "name": "username",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     },
+     {
+      "name": "birthday_timestamp_str",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "A successful response",
+      "schema": {
+       "$ref": "#/definitions/Message"
+      }
+     }
+    },
+    "security": [
+     {
+      "firebase": [ ]
+     },
+     {
+      "api_key": [ ]
+     }
+    ],
+    "x-security": [
+     {
+      "firebase": {
+       "audiences": [
+        "filler-ea8ae"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "/mobile/v1/record_upload": {
+   "post": {
+    "operationId": "MobileRecordUpload",
+    "parameters": [
+     {
       "name": "download_url",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     },
+     {
+      "name": "filename",
       "in": "query",
       "required": false,
       "type": "string"
@@ -135,7 +239,50 @@
     },
     "security": [
      {
+      "firebase": [ ]
+     },
+     {
       "api_key": [ ]
+     }
+    ],
+    "x-security": [
+     {
+      "firebase": {
+       "audiences": [
+        "filler-ea8ae"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "/mobile/v1/user_recorded_status": {
+   "post": {
+    "operationId": "MobileUserRecordedStatus",
+    "parameters": [ ],
+    "responses": {
+     "200": {
+      "description": "A successful response",
+      "schema": {
+       "$ref": "#/definitions/UserRecordStatus"
+      }
+     }
+    },
+    "security": [
+     {
+      "firebase": [ ]
+     },
+     {
+      "api_key": [ ]
+     }
+    ],
+    "x-security": [
+     {
+      "firebase": {
+       "audiences": [
+        "filler-ea8ae"
+       ]
+      }
      }
     ]
    }
@@ -167,6 +314,13 @@
    "properties": {
     "message": {
      "type": "string"
+    }
+   }
+  },
+  "UserRecordStatus": {
+   "properties": {
+    "recorded": {
+     "type": "boolean"
     }
    }
   },

@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 /** The MediaMetadata API which Endpoints will be exposing. */
 // [START echo_api_annotation]
 @Api(
-    name = "mediametadata",
+    name = "mobile",
     version = "v1",
     namespace =
       @ApiNamespace(
@@ -60,14 +60,22 @@ public class MediaMetadata {
     // [START record_upload]
     @ApiMethod(name = "record_upload",
             path = "record_upload",
-            apiKeyRequired = AnnotationBoolean.TRUE)
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+    )
     public Message recordUpload(
-                                @Named("user_id") @Nullable String userId,
+                                User user,
                                 @Named("download_url") @Nullable String downloadUrl,
                                 @Named("filename") @Nullable String filename,
                                 @Named("privacy") @Nullable String privacy,
                                 @Named("comment") @Nullable String comment
-                                ) {
+                                ) throws UnauthorizedException {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
         String filepath = "gs://" + "filler-ea8ae.appspot.com" + "/photos/" + filename;
         boolean adultContent = ImageUtils.detectSafeSearchGcs(filepath);
 
@@ -80,7 +88,7 @@ public class MediaMetadata {
             DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
             Entity uploadedMedia = new Entity("UploadedMedia");
-            uploadedMedia.setIndexedProperty("userId", userId);
+            uploadedMedia.setIndexedProperty("userId", user.getId());
             uploadedMedia.setUnindexedProperty("downloadUrl", downloadUrl);
             uploadedMedia.setUnindexedProperty("filename", filename);
             uploadedMedia.setIndexedProperty("privacy", privacy);
@@ -99,12 +107,20 @@ public class MediaMetadata {
     // [START my_images]
     @ApiMethod(name = "my_images",
             path = "my_images",
-            apiKeyRequired = AnnotationBoolean.TRUE)
-    public MyImagesResult myImages(@Named("user_id") @Nullable String userId) {
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+    )
+    public MyImagesResult myImages(User user) throws UnauthorizedException {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
         DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
         Query.Filter propertyFilter =
-        new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userId);
+        new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, user.getId());
         Query photoQuery = new Query("UploadedMedia").setFilter(propertyFilter);
 
         List<Entity> results = datastoreService.prepare(photoQuery).asList(FetchOptions.Builder.withDefaults());
@@ -124,9 +140,16 @@ public class MediaMetadata {
     // [START date_images]
     @ApiMethod(name = "date_images",
             path = "date_images",
-            apiKeyRequired = AnnotationBoolean.TRUE)
-    public MyImagesResult dateImages(@Named("timestamp") @Nullable String timestamp) throws InvalidParameterException {
-
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+    )
+    public MyImagesResult dateImages(User user, @Named("timestamp") @Nullable String timestamp)
+            throws InvalidParameterException, UnauthorizedException {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
         Logger logger = Logger.getLogger(this.getClass().getName());
 
         long timestampLong = Long.valueOf(timestamp);
@@ -174,17 +197,6 @@ public class MediaMetadata {
     }
     // [END date_images]
 
-    /* Keeping this here so that I have an example of firebase endpoint authentication for the future */
-    /**
-    * Gets the authenticated user's email. If the user is not authenticated, this will return an HTTP
-    * 401.
-    *
-    * Note that name is not specified. This will default to "{class name}.{method name}". For
-    * example, the default is "echo.getUserEmail".
-    *
-    * Note that httpMethod is not required here. Without httpMethod, this will default to GET due
-    * to the API method name. httpMethod is added here for example purposes.
-    */
     // [START firebase_auth]
     @ApiMethod(
         path = "firebase_user",
@@ -192,7 +204,24 @@ public class MediaMetadata {
         authenticators = {EspAuthenticator.class},
         issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
     )
-    public com.caitoo0o.filler.Email getUserEmailFirebase(User user) throws UnauthorizedException {
+    public com.caitoo0o.filler.Email getUserEmailFirebase(User user) throws UnauthorizedException, Exception {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
+        com.caitoo0o.filler.Email response = new com.caitoo0o.filler.Email();
+        response.setEmail(user.getEmail());
+        return response;
+    }
+
+    @ApiMethod(
+            path = "firebase_user2",
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+    )
+    public com.caitoo0o.filler.Email getUserEmailFirebase2(User user) throws UnauthorizedException, Exception {
         if (user == null) {
             throw new UnauthorizedException("Invalid credentials");
         }

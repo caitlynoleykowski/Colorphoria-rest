@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 /** The MediaMetadata API which Endpoints will be exposing. */
 // [START echo_api_annotation]
 @Api(
-    name = "usermetadata",
+    name = "mobile",
     version = "v1",
     namespace =
       @ApiNamespace(
@@ -54,14 +54,22 @@ public class UserMetadata {
 
     @ApiMethod(name = "record_new_user",
             path = "record_new_user",
-            apiKeyRequired = AnnotationBoolean.TRUE)
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+    )
     public Message record_user_metadata(
-                                @Named("user_id") @Nullable String userId,
+                                User user,
                                 @Named("email") @Nullable String email,
                                 @Named("full_name") @Nullable String fullName,
                                 @Named("username") @Nullable String username,
                                 @Named("birthday_timestamp_str") @Nullable String birthdayTimestampStr
-                                ) {
+                                ) throws UnauthorizedException {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
         // Get today's date for the user's signupDate
         Date todaysDate = new Date();
 
@@ -77,7 +85,7 @@ public class UserMetadata {
         DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
         Entity userMetadata = new Entity("UserMetadata");
-        userMetadata.setIndexedProperty("userId", userId);
+        userMetadata.setIndexedProperty("userId", user.getId());
         userMetadata.setUnindexedProperty("email", email); // TODO: Remove
         userMetadata.setUnindexedProperty("fullName", fullName);
         userMetadata.setUnindexedProperty("username", username);
@@ -93,19 +101,27 @@ public class UserMetadata {
 
     @ApiMethod(name = "user_recorded_status",
             path = "user_recorded_status",
-            apiKeyRequired = AnnotationBoolean.TRUE)
-    public UserRecordStatus userRecordedStatus(@Named("user_id") @Nullable String userId) {
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+    )
+    public UserRecordStatus userRecordedStatus(User user) throws UnauthorizedException {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
         DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
         Query.Filter propertyFilter =
-        new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userId);
+        new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, user.getId());
         Query userQuery = new Query("UserMetadata").setFilter(propertyFilter);
 
         List<Entity> results = datastoreService.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
 
         if (results.size() > 1) {
             Logger.getLogger(this.getClass().getName())
-                    .severe("User has been registered multiple times. userId: "+ userId);
+                    .severe("User has been registered multiple times. userId: "+ user.getId());
         }
 
         UserRecordStatus recordedStatus = null;

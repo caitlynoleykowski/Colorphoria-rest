@@ -21,8 +21,7 @@
         <servlet-class>com.google.api.server.spi.EndpointsServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.caitoo0o.filler.MediaMetadata,
-                            com.caitoo0o.filler.UserMetadata</param-value>
+            <param-value>com.caitoo0o.filler.MediaMetadata,com.caitoo0o.filler.UserMetadata</param-value>
         </init-param>
     </servlet>
     <!-- Route API method requests to the backend. -->
@@ -50,7 +49,7 @@
         </init-param>
         <init-param>
             <param-name>endpoints.serviceName</param-name>
-            <param-value>mediametadata-api.endpoints.${endpoints.project.id}.cloud.goog</param-value>
+            <param-value>mobile-api.endpoints.${endpoints.project.id}.cloud.goog</param-value>
         </init-param>
     </filter>
 
