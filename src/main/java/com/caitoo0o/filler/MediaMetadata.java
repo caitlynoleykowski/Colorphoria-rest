@@ -179,11 +179,12 @@ public class MediaMetadata {
         Query.CompositeFilter dateRangeFilter =
         Query.CompositeFilterOperator.and(startFilter, endFilter);
 
-        Query photoQuery = new Query("UploadedMedia").setFilter(dateRangeFilter);
+//        Query photoQuery = new Query("UploadedMedia").setFilter(dateRangeFilter);
+        Query photoQuery = new Query("UploadedMedia");
         photoQuery.addSort("timestamp", Query.SortDirection.DESCENDING);
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "photoQuery: " + photoQuery.toString());
 
-        List<Entity> results = datastoreService.prepare(photoQuery).asList(FetchOptions.Builder.withDefaults());
+        List<Entity> results = datastoreService.prepare(photoQuery).asList(FetchOptions.Builder.withLimit(20));
 
         List<String> urls = new ArrayList<>();
         for (Entity result : results) {

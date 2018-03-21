@@ -2,9 +2,9 @@
  "swagger": "2.0",
  "info": {
   "version": "1.0.0",
-  "title": "mobile-api.endpoints.filler-staging.cloud.goog"
+  "title": "mobile-api.endpoints.filler-ea8ae.cloud.goog"
  },
- "host": "mobile-api.endpoints.filler-staging.cloud.goog",
+ "host": "mobile-api.endpoints.filler-ea8ae.cloud.goog",
  "basePath": "/_ah/api",
  "schemes": [
   "https"
