@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.caitoo0o.filler;
+package com.oo0o0o.colorphoria;
 
 import com.google.api.server.spi.auth.EspAuthenticator;
 import com.google.api.server.spi.auth.common.User;
@@ -41,15 +41,15 @@ import java.util.logging.Logger;
     version = "v1",
     namespace =
       @ApiNamespace(
-        ownerDomain = "filler.caitoo0o.com",
-        ownerName = "filler.caitoo0o.com",
+        ownerDomain = "colorphoria.com",
+        ownerName = "colorphoria.com",
         packagePath = ""
       ),
     // [START_EXCLUDE]
     issuers = {
       @ApiIssuer(
         name = "firebase",
-        issuer = "https://securetoken.google.com/filler-ea8ae",
+        issuer = "https://securetoken.google.com/colorphoria-app",
         jwksUri = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com")
     }
     // [END_EXCLUDE]
@@ -63,7 +63,7 @@ public class MediaMetadata {
             httpMethod = ApiMethod.HttpMethod.POST,
             apiKeyRequired = AnnotationBoolean.TRUE,
             authenticators = {EspAuthenticator.class},
-            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
     )
     public Message recordUpload(
                                 User user,
@@ -76,7 +76,7 @@ public class MediaMetadata {
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        String filepath = "gs://" + "filler-ea8ae.appspot.com" + "/photos/" + filename;
+        String filepath = "gs://" + "colorphoria-app.appspot.com" + "/photos/" + filename;
         boolean adultContent = ImageUtils.detectSafeSearchGcs(filepath);
 
         String message = "";
@@ -110,7 +110,7 @@ public class MediaMetadata {
             httpMethod = ApiMethod.HttpMethod.POST,
             apiKeyRequired = AnnotationBoolean.TRUE,
             authenticators = {EspAuthenticator.class},
-            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
     )
     public MyImagesResult myImages(User user) throws UnauthorizedException {
         if (user == null) {
@@ -143,7 +143,7 @@ public class MediaMetadata {
             httpMethod = ApiMethod.HttpMethod.POST,
             apiKeyRequired = AnnotationBoolean.TRUE,
             authenticators = {EspAuthenticator.class},
-            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
     )
     public MyImagesResult dateImages(User user, @Named("timestamp") @Nullable String timestamp)
             throws InvalidParameterException, UnauthorizedException {
@@ -197,20 +197,74 @@ public class MediaMetadata {
         return myImages;
     }
     // [END date_images]
+	
+	// [START date_image_metadata]
+    @ApiMethod(name = "date_image_metadata",
+            path = "date_image_metadata",
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
+    )
+    public DateImagesMetadataResult dateImagesMetadata(User user, @Named("timestamp") @Nullable String timestamp)
+            throws InvalidParameterException, UnauthorizedException {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+        Logger logger = Logger.getLogger(this.getClass().getName());
+
+        DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+
+        Query photoQuery = new Query("UploadedMedia");
+        photoQuery.addSort("timestamp", Query.SortDirection.DESCENDING);
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "photoQuery: " + photoQuery.toString());
+
+        List<Entity> results = datastoreService.prepare(photoQuery).asList(FetchOptions.Builder.withLimit(20));
+
+        List<UploadedMediaEntity> mediaEntities = new ArrayList<>();
+        for (Entity result : results) {
+			UploadedMediaEntity mediaEntity = new UploadedMediaEntity();
+			mediaEntity.setDownloadUrl((String) result.getProperty("downloadUrl"));
+			mediaEntity.setFilename((String) result.getProperty("filename"));
+			mediaEntity.setPrivacy((String) result.getProperty("privacy"));
+			mediaEntity.setComment((String) result.getProperty("comment"));
+			mediaEntity.setTimestamp((Date) result.getProperty("timestamp"));
+			
+			// Get username of uploaded media
+			String userId = (String) result.getProperty("userId");
+			Query.Filter userFilter = new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userId);
+	        Query userQuery = new Query("UserMetadata").setFilter(userFilter);
+			Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "userQuery: " + userQuery.toString());
+			List<Entity> users = datastoreService.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+			if (users.size() != 1) {
+				logger.log(Level.SEVERE, "Multiple users found for the same userId: " + userId);
+			} else {
+				mediaEntity.setUsername((String) users.get(0).getProperty("username"));
+			}
+			
+            mediaEntities.add(mediaEntity);
+        }
+
+        DateImagesMetadataResult myImages = new DateImagesMetadataResult();
+        myImages.setMediaEntities(mediaEntities);
+
+        return myImages;
+    }
+    // [END date_image_metadata]
 
     // [START firebase_auth]
     @ApiMethod(
         path = "firebase_user",
         httpMethod = ApiMethod.HttpMethod.GET,
         authenticators = {EspAuthenticator.class},
-        issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+        issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
     )
-    public com.caitoo0o.filler.Email getUserEmailFirebase(User user) throws UnauthorizedException, Exception {
+    public com.oo0o0o.colorphoria.Email getUserEmailFirebase(User user) throws UnauthorizedException, Exception {
         if (user == null) {
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        com.caitoo0o.filler.Email response = new com.caitoo0o.filler.Email();
+        com.oo0o0o.colorphoria.Email response = new com.oo0o0o.colorphoria.Email();
         response.setEmail(user.getEmail());
         return response;
     }
@@ -220,14 +274,14 @@ public class MediaMetadata {
             httpMethod = ApiMethod.HttpMethod.POST,
             apiKeyRequired = AnnotationBoolean.TRUE,
             authenticators = {EspAuthenticator.class},
-            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
     )
-    public com.caitoo0o.filler.Email getUserEmailFirebase2(User user) throws UnauthorizedException, Exception {
+    public com.oo0o0o.colorphoria.Email getUserEmailFirebase2(User user) throws UnauthorizedException, Exception {
         if (user == null) {
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        com.caitoo0o.filler.Email response = new com.caitoo0o.filler.Email();
+        com.oo0o0o.colorphoria.Email response = new com.oo0o0o.colorphoria.Email();
         response.setEmail(user.getEmail());
         return response;
     }

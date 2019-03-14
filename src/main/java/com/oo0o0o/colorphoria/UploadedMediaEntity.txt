@@ -1,0 +1,28 @@
+package com.oo0o0o.colorphoria;
+
+import java.util.List;
+
+/**
+ * Created by caitoo0o on 1/28/2019.
+ */
+public class UploadedMediaEntity {
+    String userId;
+	String downloadUrl;
+	String filename;
+	String privacy;
+	String comment;
+	String timestamp;
+	
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setDownloadUrl(String downloadUrl) {
+		this.downloadUrl = downloadUrl;
+	}
+	public String getDownloadUrl() {
+		return downloadUrl;
+	}
+}

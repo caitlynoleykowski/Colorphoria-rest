@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.caitoo0o.filler;
+package com.oo0o0o.colorphoria;
 
 /** The email bean that will be used in the getUserEmail response. */
 public class Email {

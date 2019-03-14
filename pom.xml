@@ -18,8 +18,8 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <groupId>com.caitoo0o.filler</groupId>
-    <artifactId>filler-rest</artifactId>
+    <groupId>com.oo0o0o.colorphoria</groupId>
+    <artifactId>colorphoria-rest</artifactId>
 
     <!--    <parent>
         <artifactId>appengine-doc-samples</artifactId>
@@ -27,26 +27,26 @@
         <version>1.0.0</version>
         <relativePath>../..</relativePath>
     </parent> -->
+	
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <endpoints.framework.version>2.0.7</endpoints.framework.version>
-        <endpoints.management.version>1.0.3</endpoints.management.version>
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <appengine.maven.plugin.version>1.3.1</appengine.maven.plugin.version>
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<endpoints.framework.version>2.2.1</endpoints.framework.version>
+
+		<endpoints.project.id>colorphoria-app</endpoints.project.id>
+
     </properties>
 
     <dependencies>
         <!-- Compile/runtime dependencies -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>com.google.endpoints</groupId>
             <artifactId>endpoints-framework</artifactId>
@@ -55,8 +55,25 @@
         <dependency>
             <groupId>com.google.endpoints</groupId>
             <artifactId>endpoints-management-control-appengine-all</artifactId>
-            <version>${endpoints.management.version}</version>
+            <version>1.0.11</version>
         </dependency>
+		<dependency>
+			<groupId>com.google.appengine</groupId>
+			<artifactId>appengine-api-1.0-sdk</artifactId>
+			<version>1.9.71</version>
+		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+			<type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+		<dependency>
+		  <groupId>javax.inject</groupId>
+		  <artifactId>javax.inject</artifactId>
+		  <version>1</version>
+		</dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-vision</artifactId>
@@ -71,81 +88,69 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <endpoints.project.id>filler-staging</endpoints.project.id>
+                <endpoints.project.id>colorphoria-staging</endpoints.project.id>
             </properties>
         </profile>
         <profile>
             <id>prod</id>
             <properties>
-                <endpoints.project.id>filler-ea8ae</endpoints.project.id>
+                <endpoints.project.id>colorphoria-app</endpoints.project.id>
             </properties>
-        </profile>
-        <profile>
-            <id>GetSwaggerDoc</id>
-            <activation>
-                <property>
-                    <name>GetSwaggerDoc</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.4.0</version>
-                        <configuration>
-                            <includePluginDependencies>true</includePluginDependencies>
-                            <mainClass>com.google.api.server.spi.tools.EndpointsTool</mainClass>
-                            <arguments>
-                                <argument>get-swagger-doc</argument>
-                                <argument>--hostname=mobile-api.endpoints.${endpoints.project.id}.cloud.goog</argument>
-                                <argument>--war=target/filler-rest-1.0-SNAPSHOT</argument>
-                                <argument>com.caitoo0o.filler.MediaMetadata</argument>
-                                <argument>com.caitoo0o.filler.UserMetadata</argument>
-                            </arguments>
-                        </configuration>
-                        <dependencies>
-                            <dependency>
-                                <groupId>com.google.endpoints</groupId>
-                                <artifactId>endpoints-framework-tools</artifactId>
-                                <version>${endpoints.framework.version}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>com.google.appengine</groupId>
-                                <artifactId>appengine-api-1.0-sdk</artifactId>
-                                <version>1.9.30</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 
     <build>
-        <!-- for hot reload of the web application-->
-        <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${basedir}/src/main/webapp/WEB-INF</directory>
-                            <filtering>true</filtering>
-                            <targetPath>WEB-INF</targetPath>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>appengine-maven-plugin</artifactId>
-                <version>${appengine.maven.plugin.version}</version>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- for hot reload of the web application-->
+    <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes
+    </outputDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <webResources>
+            <resources>
+              <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+              <filtering>true</filtering>
+              <targetPath>WEB-INF</targetPath>
+            </resources>
+          </webResources>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>appengine-maven-plugin</artifactId>
+        <version>1.3.2</version>
+        <configuration>
+          <!-- deploy configuration -->
+        </configuration>
+      </plugin>
+      <!-- [START endpoints_plugin] -->
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>endpoints-framework-maven-plugin</artifactId>
+        <version>1.0.2</version>
+        <configuration>
+          <!-- plugin configuration -->
+          <hostname>${endpoints.project.id}.appspot.com</hostname>
+        </configuration>
+      </plugin>
+      <!-- [END endpoints_plugin] -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>display-dependency-updates</goal>
+              <goal>display-plugin-updates</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

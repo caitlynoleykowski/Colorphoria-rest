@@ -14,14 +14,18 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"  version="2.5">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
     <!-- Wrap the backend with Endpoints Frameworks v2. -->
     <servlet>
         <servlet-name>EndpointsServlet</servlet-name>
         <servlet-class>com.google.api.server.spi.EndpointsServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.caitoo0o.filler.MediaMetadata,com.caitoo0o.filler.UserMetadata</param-value>
+            <param-value>com.oo0o0o.colorphoria.MediaMetadata,com.oo0o0o.colorphoria.UserMetadata</param-value>
         </init-param>
     </servlet>
     <!-- Route API method requests to the backend. -->
@@ -32,7 +36,7 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-
+    <!-- [START api_management] -->
     <!-- Add a filter that fetches the service config from service management. -->
     <filter>
         <filter-name>endpoints-api-configuration</filter-name>
@@ -49,7 +53,7 @@
         </init-param>
         <init-param>
             <param-name>endpoints.serviceName</param-name>
-            <param-value>mobile-api.endpoints.${endpoints.project.id}.cloud.goog</param-value>
+            <param-value>${endpoints.project.id}.appspot.com</param-value>
         </init-param>
     </filter>
 
@@ -62,4 +66,5 @@
         <filter-name>endpoints-api-controller</filter-name>
         <servlet-name>EndpointsServlet</servlet-name>
     </filter-mapping>
+    <!-- [END api_management] -->
 </web-app>

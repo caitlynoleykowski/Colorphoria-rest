@@ -2,9 +2,9 @@
  "swagger": "2.0",
  "info": {
   "version": "1.0.0",
-  "title": "mobile-api.endpoints.filler-ea8ae.cloud.goog"
+  "title": "mobile-api.endpoints.colorphoria-app.cloud.goog"
  },
- "host": "mobile-api.endpoints.filler-ea8ae.cloud.goog",
+ "host": "mobile-api.endpoints.colorphoria-app.cloud.goog",
  "basePath": "/_ah/api",
  "schemes": [
   "https"
@@ -16,6 +16,44 @@
   "application/json"
  ],
  "paths": {
+  "/mobile/v1/date_image_metadata": {
+   "post": {
+    "operationId": "MobileDateImagesMetadata",
+    "parameters": [
+     {
+      "name": "timestamp",
+      "in": "query",
+      "required": false,
+      "type": "string"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "A successful response",
+      "schema": {
+       "$ref": "#/definitions/DateImagesMetadataResult"
+      }
+     }
+    },
+    "security": [
+     {
+      "firebase": [ ]
+     },
+     {
+      "api_key": [ ]
+     }
+    ],
+    "x-security": [
+     {
+      "firebase": {
+       "audiences": [
+        "colorphoria-app"
+       ]
+      }
+     }
+    ]
+   }
+  },
   "/mobile/v1/date_images": {
    "post": {
     "operationId": "MobileDateImages",
@@ -47,7 +85,7 @@
      {
       "firebase": {
        "audiences": [
-        "filler-ea8ae"
+        "colorphoria-app"
        ]
       }
      }
@@ -75,7 +113,7 @@
      {
       "firebase": {
        "audiences": [
-        "filler-ea8ae"
+        "colorphoria-app"
        ]
       }
      }
@@ -106,7 +144,7 @@
      {
       "firebase": {
        "audiences": [
-        "filler-ea8ae"
+        "colorphoria-app"
        ]
       }
      }
@@ -137,7 +175,7 @@
      {
       "firebase": {
        "audiences": [
-        "filler-ea8ae"
+        "colorphoria-app"
        ]
       }
      }
@@ -193,7 +231,7 @@
      {
       "firebase": {
        "audiences": [
-        "filler-ea8ae"
+        "colorphoria-app"
        ]
       }
      }
@@ -249,7 +287,7 @@
      {
       "firebase": {
        "audiences": [
-        "filler-ea8ae"
+        "colorphoria-app"
        ]
       }
      }
@@ -280,7 +318,7 @@
      {
       "firebase": {
        "audiences": [
-        "filler-ea8ae"
+        "colorphoria-app"
        ]
       }
      }
@@ -298,7 +336,7 @@
    "type": "oauth2",
    "authorizationUrl": "",
    "flow": "implicit",
-   "x-google-issuer": "https://securetoken.google.com/filler-ea8ae",
+   "x-google-issuer": "https://securetoken.google.com/colorphoria-app",
    "x-google-jwks_uri": "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
   }
  },
@@ -310,10 +348,42 @@
     }
    }
   },
+  "UploadedMediaEntity": {
+   "properties": {
+    "comment": {
+     "type": "string"
+    },
+    "downloadUrl": {
+     "type": "string"
+    },
+    "filename": {
+     "type": "string"
+    },
+    "privacy": {
+     "type": "string"
+    },
+    "timestamp": {
+     "type": "string"
+    },
+    "userId": {
+     "type": "string"
+    }
+   }
+  },
   "Message": {
    "properties": {
     "message": {
      "type": "string"
+    }
+   }
+  },
+  "DateImagesMetadataResult": {
+   "properties": {
+    "mediaEntities": {
+     "type": "array",
+     "items": {
+      "$ref": "#/definitions/UploadedMediaEntity"
+     }
     }
    }
   },

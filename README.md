@@ -1,2 +1,2 @@
-# Filler-rest
+# Colorphoria-rest
 Rest endpoints

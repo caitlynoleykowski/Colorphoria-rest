@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.caitoo0o.filler;
+package com.oo0o0o.colorphoria;
 
 import com.google.api.server.spi.auth.EspAuthenticator;
 import com.google.api.server.spi.auth.common.User;
@@ -36,15 +36,15 @@ import java.util.logging.Logger;
     version = "v1",
     namespace =
       @ApiNamespace(
-        ownerDomain = "filler.caitoo0o.com",
-        ownerName = "filler.caitoo0o.com",
+        ownerDomain = "colorphoria.com",
+        ownerName = "colorphoria.com",
         packagePath = ""
       ),
     // [START_EXCLUDE]
     issuers = {
       @ApiIssuer(
         name = "firebase",
-        issuer = "https://securetoken.google.com/filler-ea8ae",
+        issuer = "https://securetoken.google.com/colorphoria-app",
         jwksUri = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com")
     }
     // [END_EXCLUDE]
@@ -57,7 +57,7 @@ public class UserMetadata {
             httpMethod = ApiMethod.HttpMethod.POST,
             apiKeyRequired = AnnotationBoolean.TRUE,
             authenticators = {EspAuthenticator.class},
-            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
     )
     public Message record_user_metadata(
                                 User user,
@@ -104,7 +104,7 @@ public class UserMetadata {
             httpMethod = ApiMethod.HttpMethod.POST,
             apiKeyRequired = AnnotationBoolean.TRUE,
             authenticators = {EspAuthenticator.class},
-            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"filler-ea8ae"})}
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
     )
     public UserRecordStatus userRecordedStatus(User user) throws UnauthorizedException {
         if (user == null) {

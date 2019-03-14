@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.caitoo0o.filler;
+package com.oo0o0o.colorphoria;
 
 /** The message bean that will be used in the echo request and response. */
 public class Message {
