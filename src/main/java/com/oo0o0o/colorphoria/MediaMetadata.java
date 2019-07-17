@@ -241,7 +241,7 @@ public class MediaMetadata {
 			} else {
 				mediaEntity.setUsername((String) users.get(0).getProperty("username"));
 			}
-			
+
             mediaEntities.add(mediaEntity);
         }
 
@@ -251,6 +251,63 @@ public class MediaMetadata {
         return myImages;
     }
     // [END date_image_metadata]
+
+    // [START my_image_metadata]
+    @ApiMethod(name = "my_image_metadata",
+            path = "my_image_metadata",
+            httpMethod = ApiMethod.HttpMethod.POST,
+            apiKeyRequired = AnnotationBoolean.TRUE,
+            authenticators = {EspAuthenticator.class},
+            issuerAudiences = {@ApiIssuerAudience(name = "firebase", audiences = {"colorphoria-app"})}
+    )
+    public DateImagesMetadataResult myImagesMetadata(User user, @Named("timestamp") @Nullable String timestamp)
+            throws InvalidParameterException, UnauthorizedException {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+        Logger logger = Logger.getLogger(this.getClass().getName());
+
+        DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+
+        // Get username of user
+        String userId = user.getId();
+        Query.Filter userFilter = new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userId);
+        Query userQuery = new Query("UserMetadata").setFilter(userFilter);
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "userQuery: " + userQuery.toString());
+        List<Entity> users = datastoreService.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+        if (users.size() != 1) {
+            logger.log(Level.SEVERE, "Multiple users found for the same userId: " + userId);
+        }
+        String username = (String) users.get(0).getProperty("username");
+
+        Query photoQuery = new Query("UploadedMedia");
+//        photoQuery.addSort("timestamp", Query.SortDirection.DESCENDING); // Needs composite index for this
+        Query.Filter propertyFilter =
+                new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, user.getId());
+        photoQuery.setFilter(propertyFilter);
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "photoQuery: " + photoQuery.toString());
+
+        List<Entity> results = datastoreService.prepare(photoQuery).asList(FetchOptions.Builder.withDefaults());
+
+        List<UploadedMediaEntity> mediaEntities = new ArrayList<>();
+        for (Entity result : results) {
+            UploadedMediaEntity mediaEntity = new UploadedMediaEntity();
+            mediaEntity.setDownloadUrl((String) result.getProperty("downloadUrl"));
+            mediaEntity.setFilename((String) result.getProperty("filename"));
+            mediaEntity.setPrivacy((String) result.getProperty("privacy"));
+            mediaEntity.setComment((String) result.getProperty("comment"));
+            mediaEntity.setTimestamp((Date) result.getProperty("timestamp"));
+            mediaEntity.setUsername(username);
+
+            mediaEntities.add(mediaEntity);
+        }
+
+        DateImagesMetadataResult myImages = new DateImagesMetadataResult();
+        myImages.setMediaEntities(mediaEntities);
+
+        return myImages;
+    }
+    // [END my_image_metadata]
 
     // [START firebase_auth]
     @ApiMethod(
